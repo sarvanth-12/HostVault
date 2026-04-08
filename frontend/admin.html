@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — HostVault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0c10;--bg2:#0f1117;--surface:#13161d;--surface2:#1a1e28;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --text:#f0f2f8;--text2:#9ba3b8;--muted:#5a6278;
+  --blue:#4f8eff;--blue2:#3a7aff;--blue-dim:rgba(79,142,255,.1);--blue-glow:rgba(79,142,255,.25);
+  --purple:#a78bfa;--purple2:#7c3aed;--purple-dim:rgba(167,139,250,.1);--purple-glow:rgba(167,139,250,.25);
+  --green:#34d399;--green-dim:rgba(52,211,153,.1);
+  --red:#f87171;--red-dim:rgba(248,113,113,.1);
+  --amber:#fbbf24;--amber-dim:rgba(251,191,36,.1);
+  --font:'DM Sans',sans-serif;--font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;
+  --radius:12px;--radius-lg:18px;--sidebar-w:250px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);--shadow-lg:0 12px 48px rgba(0,0,0,.6);
+}
+[data-theme="light"] {
+  --bg:#f4f5f8;--bg2:#eceef3;--surface:#fff;--surface2:#f8f9fc;
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);
+  --text:#0f1117;--text2:#4a5268;--muted:#8a93a8;
+  --blue-dim:rgba(79,142,255,.08);--purple-dim:rgba(167,139,250,.08);
+  --green-dim:rgba(52,211,153,.08);--red-dim:rgba(248,113,113,.08);--amber-dim:rgba(251,191,36,.08);
+  --shadow:0 4px 24px rgba(0,0,0,.08);--shadow-lg:0 12px 48px rgba(0,0,0,.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:10}
+.sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent);opacity:.7}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;text-decoration:none;color:var(--text)}
+.sb-logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--purple2),var(--blue2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px var(--purple-glow);flex-shrink:0}
+.sb-logo-name{font-family:var(--font-head);font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+.sb-admin-pill{margin:0 14px 14px;background:var(--purple-dim);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:.75rem;font-weight:600;color:var(--purple)}
+.sb-section{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:10px 20px 5px}
+.sb-nav{flex:1;overflow-y:auto;padding:0 10px}
+.sb-nav::-webkit-scrollbar{width:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:var(--text2);text-decoration:none;font-size:.875rem;font-weight:500;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;margin-bottom:1px;position:relative;overflow:hidden;font-family:var(--font)}
+.sb-item:hover{color:var(--text);background:var(--surface2)}
+.sb-item.active{color:var(--purple);background:var(--purple-dim);font-weight:600}
+.sb-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--purple);border-radius:0 2px 2px 0}
+.sb-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--surface2);flex-shrink:0;transition:all .15s}
+.sb-item.active .sb-icon{background:var(--purple-dim)}
+.sb-footer{padding:12px;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--radius);background:var(--surface2);border:1px solid var(--border)}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--purple2),var(--blue2));color:#fff;font-family:var(--font-head);font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 10px var(--purple-glow)}
+.sb-uname{font-size:.82rem;font-weight:600;color:var(--text);line-height:1.2}
+.sb-urole{font-size:.7rem;color:var(--purple)}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;gap:16px}
+.page-title{font-family:var(--font-head);font-size:1.05rem;font-weight:700;letter-spacing:-.02em}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.content{flex:1;overflow-y:auto;padding:24px 28px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* VIEWS */
+.view{display:none;animation:fadeIn .2s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* STATS */
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;align-items:center;gap:14px;transition:border-color .15s;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.blue::after{background:linear-gradient(90deg,var(--blue2),transparent)}
+.stat-card.purple::after{background:linear-gradient(90deg,var(--purple2),transparent)}
+.stat-card.green::after{background:linear-gradient(90deg,var(--green),transparent)}
+.stat-card.amber::after{background:linear-gradient(90deg,var(--amber),transparent)}
+.stat-card:hover{border-color:var(--border2)}
+.stat-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.si-blue{background:var(--blue-dim)}.si-purple{background:var(--purple-dim)}.si-green{background:var(--green-dim)}.si-amber{background:var(--amber-dim)}
+.stat-val{font-family:var(--font-head);font-size:1.3rem;font-weight:700;line-height:1;margin-bottom:3px}
+.stat-lbl{font-size:.72rem;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.stat-sub{font-size:.72rem;color:var(--muted);margin-top:2px;font-family:var(--font-mono)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.card-title{font-family:var(--font-head);font-size:.9rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--blue2);color:#fff}
+.btn-primary:hover{background:var(--blue);box-shadow:0 0 16px var(--blue-glow)}
+.btn-purple{background:var(--purple2);color:#fff}
+.btn-purple:hover{background:var(--purple);box-shadow:0 0 16px var(--purple-glow)}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);background:var(--bg2)}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.btn-danger:hover{background:rgba(248,113,113,.2)}
+.btn-success{background:var(--green-dim);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.btn-sm{padding:6px 12px;font-size:.78rem}
+.btn-xs{padding:4px 10px;font-size:.72rem;border-radius:6px}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table thead tr{border-bottom:1px solid var(--border)}
+.data-table th{padding:10px 16px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:left}
+.data-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tbody tr:last-child td{border-bottom:none}
+.data-table tbody tr{transition:background .1s}
+.data-table tbody tr:hover{background:var(--surface2)}
+.user-cell{display:flex;align-items:center;gap:10px}
+.user-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-head);font-weight:700;font-size:.8rem;flex-shrink:0}
+.user-name{font-weight:600;font-size:.875rem}
+.user-email{font-size:.72rem;color:var(--muted);margin-top:1px}
+.mono{font-family:var(--font-mono);font-size:.78rem;color:var(--text2)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:.68rem;font-weight:700;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.04em}
+.badge-blue{background:var(--blue-dim);color:var(--blue)}.badge-purple{background:var(--purple-dim);color:var(--purple)}.badge-green{background:var(--green-dim);color:var(--green)}.badge-red{background:var(--red-dim);color:var(--red)}.badge-amber{background:var(--amber-dim);color:var(--amber)}.badge-gray{background:rgba(156,163,175,.1);color:var(--text2)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.search-box{position:relative;display:flex;align-items:center;flex:1;min-width:160px;max-width:280px}
+.search-ico{position:absolute;left:11px;color:var(--muted);font-size:13px;pointer-events:none}
+.search-box input{width:100%;padding:7px 10px 7px 32px;border:1px solid var(--border2);border-radius:8px;background:var(--surface);color:var(--text);font-size:.83rem;font-family:var(--font);outline:none;transition:border-color .15s,box-shadow .15s}
+.search-box input:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-dim)}
+.filter-sel{padding:7px 10px;border:1px solid var(--border2);border-radius:8px;background:var(--surface);color:var(--text);font-size:.8rem;font-family:var(--font);cursor:pointer;outline:none}
+
+/* TAB NAV (inside content) */
+.tab-nav{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tab-nav::-webkit-scrollbar{height:0}
+.tab-btn{padding:10px 18px;border:none;background:transparent;font-size:.83rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;font-family:var(--font-head)}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--purple);border-bottom-color:var(--purple)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .15s ease}
+
+/* STATUS DOT */
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+.dot-green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot-red{background:var(--red);box-shadow:0 0 6px var(--red)}
+.dot-amber{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+
+/* STORAGE CARDS */
+.storage-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.storage-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.si-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.si-val{font-size:1.1rem;font-weight:700;font-family:var(--font-head)}
+.si-sub{font-size:.72rem;color:var(--muted);margin-top:3px;font-family:var(--font-mono)}
+
+/* LOG ITEM */
+.log-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.log-item:last-child{border-bottom:none}
+.log-icon{width:32px;height:32px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.log-body{flex:1;min-width:0}
+.log-msg{font-size:.83rem;color:var(--text);line-height:1.4}
+.log-msg b{color:var(--blue)}
+.log-time{font-size:.72rem;color:var(--muted);font-family:var(--font-mono);margin-top:2px}
+
+/* SERVER STATUS */
+.server-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.srv-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.srv-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.srv-title{font-family:var(--font-head);font-size:.9rem;font-weight:700}
+.srv-body{padding:16px 20px;font-size:.83rem;color:var(--text2);line-height:1.7}
+
+/* USER-FILE PANEL */
+.uf-user-row{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.uf-user-row:hover{background:var(--surface2)}
+.uf-user-row:last-child{border-bottom:none}
+.uf-tabs{display:flex;gap:4px;margin-bottom:16px}
+.uf-tab{padding:7px 14px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;background:none;font-family:var(--font);color:var(--text2);transition:all .15s}
+.uf-tab.active{background:var(--purple-dim);color:var(--purple)}
+.uf-tab:hover:not(.active){background:var(--surface2);color:var(--text)}
+
+/* THEME BTN */
+.theme-btn{width:34px;height:34px;border-radius:8px;background:var(--surface2);border:1px solid var(--border2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .15s}
+.theme-btn:hover{color:var(--text)}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 24px}
+.empty-icon{font-size:44px;margin-bottom:12px;display:block;filter:grayscale(.4) opacity(.6)}
+.empty-title{font-family:var(--font-head);font-size:.95rem;font-weight:700;margin-bottom:5px}
+.empty-sub{font-size:.83rem;color:var(--text2)}
+
+/* FILE THUMB */
+.file-thumb{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ft-pdf{background:rgba(248,113,113,.12)}.ft-image{background:rgba(52,211,153,.12)}.ft-zip{background:rgba(251,191,36,.12)}.ft-doc{background:rgba(79,142,255,.12)}.ft-video{background:rgba(167,139,250,.12)}.ft-audio{background:rgba(236,72,153,.12)}.ft-text{background:rgba(156,163,175,.12)}.ft-db{background:rgba(52,211,153,.12)}.ft-default{background:rgba(156,163,175,.12)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="index.html" class="sb-logo">
+      <div class="sb-logo-mark">☁</div>
+      <span class="sb-logo-name">HostVault</span>
+    </a>
+    <div class="sb-admin-pill">
+      <span>🛡️</span> Admin Control Panel
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Management</div>
+      <button class="sb-item active" data-tab="users" onclick="switchTab('users',this)">
+        <span class="sb-icon">👥</span> Users
+      </button>
+      <button class="sb-item" data-tab="storage" onclick="switchTab('storage',this)">
+        <span class="sb-icon">🗄️</span> Storage
+      </button>
+      <button class="sb-item" data-tab="server" onclick="switchTab('server',this)">
+        <span class="sb-icon">🖥️</span> Server Status
+      </button>
+      <button class="sb-item" data-tab="logs" onclick="switchTab('logs',this)">
+        <span class="sb-icon">📋</span> Activity Logs
+      </button>
+      <button class="sb-item" data-tab="userfiles" onclick="switchTab('userfiles',this)">
+        <span class="sb-icon">📂</span> User Files
+      </button>
+      <div class="sb-section">Navigation</div>
+      <a class="sb-item" href="dashboard.html">
+        <span class="sb-icon">↩️</span> User View
+      </a>
+      <button class="sb-item" onclick="doLogout()">
+        <span class="sb-icon">🚪</span> Sign Out
+      </button>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sbAvatar">AD</div>
+        <div>
+          <div class="sb-uname" id="sbName">Admin</div>
+          <div class="sb-urole">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="pageTitle">User Management</div>
+      <div class="topbar-right">
+        <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">☀️</button>
+        <span id="sysStatus" class="badge badge-gray">● Checking…</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- TOP STAT STRIP -->
+      <div class="stat-strip">
+        <div class="stat-card blue">
+          <div class="stat-icon si-blue">👥</div>
+          <div>
+            <div class="stat-val" id="ovTotalUsers">—</div>
+            <div class="stat-lbl">Total Users</div>
+            <div class="stat-sub" id="ovActiveUsers">— active</div>
+          </div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon si-purple">💾</div>
+          <div>
+            <div class="stat-val" id="ovStorageUsed">—</div>
+            <div class="stat-lbl">Storage Used</div>
+            <div class="stat-sub" id="ovTotalFiles">— files</div>
+          </div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon si-green">🗄️</div>
+          <div>
+            <div class="stat-val" id="ovMinio">—</div>
+            <div class="stat-lbl">MinIO</div>
+            <div class="stat-sub" id="ovMinioSub">checking…</div>
+          </div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon si-amber">🐘</div>
+          <div>
+            <div class="stat-val" id="ovDb">—</div>
+            <div class="stat-lbl">PostgreSQL</div>
+            <div class="stat-sub" id="ovDbSub">checking…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEWS -->
+
+      <!-- USERS -->
+      <div id="view-users" class="view active">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">👥 All Users</div>
+          </div>
+          <div class="filter-bar">
+            <div class="search-box">
+              <span class="search-ico">🔍</span>
+              <input type="search" id="usearch" placeholder="Search users…" oninput="filterUsers()" autocomplete="off">
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>User</th><th>Role</th><th>Storage</th><th>Files</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="utbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STORAGE -->
+      <div id="view-storage" class="view">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🗄️ MinIO Storage</div>
+            <span id="stMinioStatus" class="badge badge-gray">checking…</span>
+          </div>
+          <div class="card-body">
+            <div class="storage-grid">
+              <div class="storage-item">
+                <div class="si-lbl">Bucket</div>
+                <div class="si-val" id="stBucket">—</div>
+              </div>
+              <div class="storage-item">
+                <div class="si-lbl">Endpoint</div>
+                <div class="si-val" style="font-family:var(--font-mono);font-size:.9rem" id="stEndpoint">—</div>
+              </div>
+              <div class="storage-item">
+                <div class="si-lbl">Total Objects</div>
+                <div class="si-val" id="stTotalFiles">—</div>
+              </div>
+              <div class="storage-item">
+                <div class="si-lbl">MinIO Total Size</div>
+                <div class="si-val" id="stMinioSize">—</div>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="storage-item" style="margin:0">
+                <div class="si-lbl">Active Files (DB)</div>
+                <div class="si-val" id="stTotalSize">—</div>
+              </div>
+              <div class="storage-item" style="margin:0">
+                <div class="si-lbl">Trash Size</div>
+                <div class="si-val" id="stTrashSize">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SERVER STATUS -->
+      <div id="view-server" class="view">
+        <div class="server-grid">
+          <div class="srv-card">
+            <div class="srv-hdr">
+              <div class="srv-title">🐘 PostgreSQL</div>
+              <span id="healthDb" class="badge badge-gray">checking…</span>
+            </div>
+            <div class="srv-body">Connected via SQLAlchemy ORM.<br>Status is verified live on each page load.</div>
+          </div>
+          <div class="srv-card">
+            <div class="srv-hdr">
+              <div class="srv-title">🗄️ MinIO</div>
+              <span id="healthMinio" class="badge badge-gray">checking…</span>
+            </div>
+            <div class="srv-body">Single-node object storage.<br>Bucket: <span id="healthBucket" style="font-family:var(--font-mono);color:var(--text)">—</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🌐 Overall System</div>
+            <span id="healthOverall" class="badge badge-gray">checking…</span>
+          </div>
+          <div class="card-body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div style="font-size:.875rem;color:var(--text2);flex:1">Running on <strong style="color:var(--text)">Flask + Waitress</strong> · Single-node setup · Nginx reverse proxy</div>
+            <button class="btn btn-ghost btn-sm" onclick="loadHealth()">🔄 Re-check Status</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGS -->
+      <div id="view-logs" class="view">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📋 Activity Logs</div>
+          </div>
+          <div class="filter-bar">
+            <div class="search-box">
+              <span class="search-ico">🔍</span>
+              <input type="search" id="logSearch" placeholder="Search by user or action…" oninput="filterLogs()" autocomplete="off">
+            </div>
+            <select class="filter-sel" id="logType" onchange="filterLogs()">
+              <option value="">All Events</option>
+              <option value="upload">Uploads</option>
+              <option value="login">Logins</option>
+              <option value="delete">Deletes</option>
+              <option value="register">Registrations</option>
+            </select>
+          </div>
+          <div class="card-body" style="padding:0 20px" id="logsBody"></div>
+        </div>
+      </div>
+
+      <!-- USER FILES -->
+      <div id="view-userfiles" class="view">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">📂 User File Manager</div>
+          </div>
+          <div class="filter-bar" id="ufSearchBar">
+            <div class="search-box">
+              <span class="search-ico">🔍</span>
+              <input type="search" id="ufUserSearch" placeholder="Search users…" oninput="filterUfUsers()" autocomplete="off">
+            </div>
+          </div>
+          <!-- User list -->
+          <div id="ufUserList"></div>
+          <!-- Files panel -->
+          <div id="ufFilesPanel" style="display:none;padding:20px">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <button class="btn btn-ghost btn-sm" onclick="closeUfPanel()">← Back</button>
+              <div id="ufSelectedUser" style="font-family:var(--font-head);font-weight:700;font-size:.95rem"></div>
+            </div>
+            <div class="uf-tabs">
+              <button class="uf-tab active" id="ufTabFiles" onclick="switchUfTab('files')">📁 Files</button>
+              <button class="uf-tab" id="ufTabTrash" onclick="switchUfTab('trash')">🗑️ Trash</button>
+            </div>
+            <div id="ufFilesContent"></div>
+            <div id="ufTrashContent" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// Theme
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeBtn').textContent=d?'🌙':'☀️';localStorage.setItem('hv-theme',d?'light':'dark');}
+const _t=localStorage.getItem('hv-theme')||'dark';
+document.documentElement.setAttribute('data-theme',_t);
+document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('themeBtn');if(b)b.textContent=_t==='dark'?'☀️':'🌙';});
+
+// Helpers
+const fmtSz=b=>{if(!b||b===0)return'0 B';if(b<1048576)return(b/1024).toFixed(1)+' KB';if(b<1073741824)return(b/1048576).toFixed(1)+' MB';return(b/1073741824).toFixed(2)+' GB'};
+const fmtDt=d=>d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const timeAgo=d=>{if(!d)return'—';const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const TYPES={pdf:'pdf',zip:'zip',tar:'zip',gz:'zip',png:'image',jpg:'image',jpeg:'image',gif:'image',webp:'image',doc:'doc',docx:'doc',pptx:'doc',xlsx:'doc',txt:'text',csv:'text',log:'text',sql:'db',mp4:'video',mkv:'video',mp3:'audio',wav:'audio'};
+const ICONS={pdf:'📄',zip:'🗃️',image:'🖼️',doc:'📊',text:'📝',db:'🗄️',video:'🎬',audio:'🎵',default:'📁'};
+const COLORS={pdf:'ft-pdf',zip:'ft-zip',image:'ft-image',doc:'ft-doc',text:'ft-text',db:'ft-db',video:'ft-video',audio:'ft-audio',default:'ft-default'};
+function getType(n){return TYPES[n.split('.').pop().toLowerCase()]||'default';}
+
+async function api(m,u,b){
+  const o={method:m,credentials:'include',headers:{}};
+  if(b){o.headers['Content-Type']='application/json';o.body=JSON.stringify(b);}
+  const r=await fetch(u,o);
+  if(r.status===401){window.location.href='/login.html';return null;}
+  if(r.status===403){window.location.href='/dashboard.html';return null;}
+  return r;
+}
+
+// Tab switching (sidebar)
+const tabTitles={users:'User Management',storage:'Storage Monitoring',server:'Server Status',logs:'Activity Logs',userfiles:'User File Manager'};
+function switchTab(n,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+n).classList.add('active');
+  document.getElementById('pageTitle').textContent=tabTitles[n]||n;
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  const t=el||document.querySelector('[data-tab="'+n+'"]');if(t)t.classList.add('active');
+  if(n==='users')loadUsers();
+  if(n==='storage')loadStorage();
+  if(n==='server')loadHealth();
+  if(n==='logs')loadLogs();
+  if(n==='userfiles')loadUfUsers();
+}
+
+// USERS
+let allUsers=[];
+async function loadUsers(){
+  const tb=document.getElementById('utbody');
+  tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">Loading…</td></tr>`;
+  const res=await api('GET','/api/admin/users');if(!res)return;
+  allUsers=(await res.json()).users||[];
+  renderUsers(allUsers);
+}
+function renderUsers(users){
+  const tb=document.getElementById('utbody');
+  if(!users.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted)">No users found.</td></tr>`;return;}
+  tb.innerHTML=users.map(u=>{
+    const init=((u.first_name||'')[0]||'')+((u.last_name||'')[0]||'');
+    const isAdmin=u.role==='admin';
+    const avBg=isAdmin?'linear-gradient(135deg,#7c3aed,#4f8eff)':'linear-gradient(135deg,#3a7aff,#06b6d4)';
+    return`<tr>
+      <td><div class="user-cell">
+        <div class="user-av" style="background:${avBg}">${init.toUpperCase()||'?'}</div>
+        <div><div class="user-name">${esc(u.full_name||u.email)}</div><div class="user-email">${esc(u.email)}</div></div>
+      </div></td>
+      <td><span class="badge ${isAdmin?'badge-purple':'badge-gray'}">${u.role}</span></td>
+      <td><span class="mono">${fmtSz(u.storage_used||0)}</span></td>
+      <td><span class="mono">${u.file_count||0}</span></td>
+      <td><span style="font-size:.78rem;color:var(--text2)">${fmtDt(u.created_at)}</span></td>
+      <td><span class="badge ${u.is_active?'badge-green':'badge-gray'}">${u.is_active?'Active':'Inactive'}</span></td>
+      <td><div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-xs" onclick="toggleRole(${u.id},'${u.role}')">${isAdmin?'→ User':'→ Admin'}</button>
+        <button class="btn ${u.is_active?'btn-danger':'btn-success'} btn-xs" onclick="toggleUser(${u.id},${u.is_active})">${u.is_active?'Disable':'Enable'}</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+async function toggleUser(id,isActive){const r=await api('PUT',`/api/admin/users/${id}`,{is_active:!isActive});if(r&&r.ok)loadUsers();}
+async function toggleRole(id,role){const r=await api('PUT',`/api/admin/users/${id}`,{role:role==='admin'?'user':'admin'});if(r&&r.ok)loadUsers();}
+function filterUsers(){
+  const q=(document.getElementById('usearch')?.value||'').toLowerCase();
+  renderUsers(allUsers.filter(u=>(u.full_name||'').toLowerCase().includes(q)||u.email.toLowerCase().includes(q)));
+}
+
+// STORAGE
+async function loadStorage(){
+  const res=await api('GET','/api/admin/storage');if(!res)return;
+  const d=await res.json();
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  const minioOk=!d.minio?.error;
+  set('stTotalFiles',d.minio?.total_objects??'—');
+  set('stTotalSize',fmtSz(d.total_db_files_size||0));
+  set('stTrashSize',fmtSz(d.total_trash_size||0));
+  set('stMinioSize',minioOk?fmtSz(d.minio?.total_size||0):'N/A');
+  set('stBucket',d.minio?.bucket||'—');
+  set('stEndpoint',d.minio?.endpoint||'—');
+  const ms=document.getElementById('stMinioStatus');
+  if(ms)ms.className='badge '+(minioOk?'badge-green':'badge-red');if(ms)ms.textContent=minioOk?'● Online':'● Error';
+  set('ovStorageUsed',fmtSz(d.total_db_files_size||0));
+  set('ovTotalFiles',(d.total_files||0)+' active files');
+  set('ovTotalUsers',d.total_users??'—');
+  set('ovActiveUsers',(d.active_users??'—')+' active');
+}
+
+// HEALTH
+async function loadHealth(){
+  const res=await api('GET','/api/admin/health');if(!res)return;
+  const d=await res.json();
+  const setB=(id,ok)=>{const el=document.getElementById(id);if(el){el.className='badge '+(ok?'badge-green':'badge-red');el.textContent=ok?'● Online':'● Error';}};
+  const dbOk=d.database?.status==='ok',minioOk=d.minio?.status==='ok',allOk=d.overall==='ok';
+  setB('healthDb',dbOk);setB('healthMinio',minioOk);setB('healthOverall',allOk);
+  const hb=document.getElementById('healthBucket');if(hb)hb.textContent=d.minio?.bucket||'—';
+  // update top strip
+  const setTxt=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  const setHtml=(id,v)=>{const el=document.getElementById(id);if(el)el.innerHTML=v;};
+  setHtml('ovDb',dbOk?'<span style="color:var(--green)">● Online</span>':'<span style="color:var(--red)">● Error</span>');
+  setTxt('ovDbSub',dbOk?'PostgreSQL connected':'Connection failed');
+  setHtml('ovMinio',minioOk?'<span style="color:var(--green)">● Online</span>':'<span style="color:var(--red)">● Error</span>');
+  setTxt('ovMinioSub',minioOk?'MinIO connected':'MinIO unreachable');
+  const ss=document.getElementById('sysStatus');
+  if(ss){ss.className='badge '+(allOk?'badge-green':'badge-red');ss.textContent=allOk?'● All Systems OK':'● System Degraded';}
+}
+
+// LOGS
+let allLogs=[];
+const logIcons={upload:'📤',download:'⬇️',delete:'🗑️',restore:'↩️',perm_delete:'💥',login:'🔐',login_fail:'⚠️',logout:'🚪',register:'👤'};
+const logColors={upload:'badge-blue',download:'badge-green',delete:'badge-red',restore:'badge-green',perm_delete:'badge-red',login:'badge-green',login_fail:'badge-amber',logout:'badge-gray',register:'badge-purple'};
+async function loadLogs(){
+  const res=await api('GET','/api/admin/logs?per_page=100');if(!res)return;
+  allLogs=(await res.json()).logs||[];
+  filterLogs();
+}
+function filterLogs(){
+  const q=(document.getElementById('logSearch')?.value||'').toLowerCase();
+  const type=document.getElementById('logType')?.value||'';
+  const d=allLogs.filter(l=>(!q||(l.user_email||'').toLowerCase().includes(q)||(l.detail||'').toLowerCase().includes(q))&&(!type||l.event_type===type));
+  const el=document.getElementById('logsBody');if(!el)return;
+  el.innerHTML=d.length
+    ?d.map(l=>`<div class="log-item">
+        <div class="log-icon">${logIcons[l.event_type]||'📋'}</div>
+        <div class="log-body">
+          <div class="log-msg"><b>${esc(l.user_email||'system')}</b> — ${esc(l.detail||l.event_type)}</div>
+          <div class="log-time">${timeAgo(l.created_at)} · ${l.ip_address||'—'}</div>
+        </div>
+        <span class="badge ${logColors[l.event_type]||'badge-gray'}" style="flex-shrink:0">${l.event_type}</span>
+      </div>`).join('')
+    :'<div style="padding:40px;text-align:center;color:var(--muted);font-size:.875rem">No logs found.</div>';
+}
+
+// USER FILES
+let ufAllUsers=[],ufCurrentUserId=null,ufCurrentData={files:[],trash:[]};
+async function loadUfUsers(){
+  const res=await api('GET','/api/admin/users');if(!res)return;
+  ufAllUsers=(await res.json()).users||[];
+  renderUfUsers(ufAllUsers);
+}
+function filterUfUsers(){
+  const q=(document.getElementById('ufUserSearch')?.value||'').toLowerCase();
+  renderUfUsers(ufAllUsers.filter(u=>(u.full_name||'').toLowerCase().includes(q)||u.email.toLowerCase().includes(q)));
+}
+function renderUfUsers(users){
+  const el=document.getElementById('ufUserList');
+  if(!users.length){el.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">No users found.</div>';return;}
+  el.innerHTML=users.map(u=>{
+    const init=((u.first_name||'')[0]||'')+((u.last_name||'')[0]||'');
+    const avBg=u.role==='admin'?'linear-gradient(135deg,#7c3aed,#4f8eff)':'linear-gradient(135deg,#3a7aff,#06b6d4)';
+    return`<div class="uf-user-row" onclick="openUfPanel(${u.id},'${(u.full_name||u.email).replace(/'/g,"\\'")}')">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="user-av" style="background:${avBg}">${init.toUpperCase()||'?'}</div>
+        <div>
+          <div class="user-name">${esc(u.full_name||u.email)}</div>
+          <div class="user-email">${esc(u.email)} · ${u.file_count||0} files · ${fmtSz(u.storage_used||0)}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="badge ${u.is_active?'badge-green':'badge-gray'}">${u.is_active?'Active':'Inactive'}</span>
+        <span style="color:var(--muted);font-size:1.1rem">›</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function openUfPanel(userId,userName){
+  ufCurrentUserId=userId;
+  document.getElementById('ufUserList').style.display='none';
+  document.getElementById('ufSearchBar').style.display='none';
+  document.getElementById('ufFilesPanel').style.display='';
+  document.getElementById('ufSelectedUser').textContent='📂 '+userName+"'s Files";
+  document.getElementById('ufFilesContent').innerHTML='<div style="padding:20px;color:var(--muted)">Loading…</div>';
+  document.getElementById('ufTrashContent').innerHTML='';
+  const res=await api('GET',`/api/admin/users/${userId}/files`);if(!res)return;
+  ufCurrentData=await res.json();
+  switchUfTab('files');
+}
+function closeUfPanel(){
+  document.getElementById('ufUserList').style.display='';
+  document.getElementById('ufSearchBar').style.display='';
+  document.getElementById('ufFilesPanel').style.display='none';
+  ufCurrentUserId=null;
+}
+function switchUfTab(tab){
+  document.getElementById('ufFilesContent').style.display=tab==='files'?'':'none';
+  document.getElementById('ufTrashContent').style.display=tab==='trash'?'':'none';
+  document.getElementById('ufTabFiles').className='uf-tab'+(tab==='files'?' active':'');
+  document.getElementById('ufTabTrash').className='uf-tab'+(tab==='trash'?' active':'');
+  if(tab==='files')renderUfFiles();else renderUfTrash();
+}
+function renderUfFiles(){
+  const files=ufCurrentData.files||[];
+  const el=document.getElementById('ufFilesContent');
+  if(!files.length){el.innerHTML='<div class="empty"><span class="empty-icon">📁</span><div class="empty-title">No files uploaded yet</div><div class="empty-sub">This user has not uploaded any files.</div></div>';return;}
+  el.innerHTML=`<div style="overflow-x:auto"><table class="data-table">
+    <thead><tr><th>File</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
+    <tbody>${files.map(f=>{const t=getType(f.filename);return`<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="file-thumb ${COLORS[t]||'ft-default'}">${ICONS[t]||ICONS.default}</div>
+        <div><div style="font-weight:600;font-size:.85rem">${esc(f.filename)}</div><div style="font-size:.72rem;color:var(--muted)">${t.toUpperCase()}</div></div>
+      </div></td>
+      <td><span class="mono">${fmtSz(f.file_size)}</span></td>
+      <td><span style="font-size:.78rem;color:var(--text2)">${fmtDt(f.uploaded_at)}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-primary btn-xs" onclick="window.location.href='/api/admin/files/${f.id}/download'">⬇️ Download</button>
+        <button class="btn btn-danger btn-xs" onclick="adminDeleteFile(${f.id})">🗑️ Delete</button>
+      </div></td>
+    </tr>`;}).join('')}</tbody>
+  </table></div>`;
+}
+function renderUfTrash(){
+  const trash=ufCurrentData.trash||[];
+  const el=document.getElementById('ufTrashContent');
+  if(!trash.length){el.innerHTML='<div class="empty"><span class="empty-icon">🗑️</span><div class="empty-title">Trash is empty</div><div class="empty-sub">No deleted files for this user.</div></div>';return;}
+  el.innerHTML=`<div style="overflow-x:auto"><table class="data-table">
+    <thead><tr><th>File</th><th>Size</th><th>Deleted</th><th>Expires</th></tr></thead>
+    <tbody>${trash.map(t=>{const tp=getType(t.filename);return`<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">
+        <div class="file-thumb ${COLORS[tp]||'ft-default'}">${ICONS[tp]||ICONS.default}</div>
+        <div style="font-weight:600;font-size:.85rem">${esc(t.filename)}</div>
+      </div></td>
+      <td><span class="mono">${fmtSz(t.file_size)}</span></td>
+      <td><span style="font-size:.78rem;color:var(--text2)">${fmtDt(t.deleted_at)}</span></td>
+      <td><span class="badge ${t.days_left<=3?'badge-red':'badge-amber'}">${t.days_left}d left</span></td>
+    </tr>`;}).join('')}</tbody>
+  </table></div>`;
+}
+async function adminDeleteFile(fileId){
+  if(!confirm('Permanently delete this file from storage? This cannot be undone.'))return;
+  const res=await api('DELETE',`/api/admin/files/${fileId}`);
+  if(res&&res.ok)await openUfPanel(ufCurrentUserId,document.getElementById('ufSelectedUser').textContent.replace("📂 ","").replace("'s Files",""));
+}
+
+// Logout
+async function doLogout(){await api('POST','/api/auth/logout');window.location.href='/admin-login.html';}
+
+// INIT
+(async()=>{
+  const res=await api('GET','/api/auth/me');if(!res)return;
+  const data=await res.json();
+  if(!data.authenticated){window.location.href='/login.html';return;}
+  if(data.user.role!=='admin'){window.location.href='/dashboard.html';return;}
+  const u=data.user;
+  const init=((u.first_name||'')[0]||'')+((u.last_name||'')[0]||'');
+  const sa=document.getElementById('sbAvatar'),sn=document.getElementById('sbName');
+  if(sa)sa.textContent=init.toUpperCase()||'AD';
+  if(sn)sn.textContent=u.full_name||'Admin';
+  switchTab('users',document.querySelector('[data-tab="users"]'));
+  loadStorage();
+  loadHealth();
+})();
+</script>
+</body>
+</html>
