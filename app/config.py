@@ -18,13 +18,12 @@ class Config:
         'max_overflow':     20,
     }
 
-    # ── MinIO ─────────────────────────────────────────────────
-    MINIO_ENDPOINT   = os.environ.get('MINIO_ENDPOINT',   'localhost:9000')
-    MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY', 'minioadmin')
-    MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY', 'minioadmin')
-    MINIO_BUCKET     = os.environ.get('MINIO_BUCKET',     'hostvault-files')
-    MINIO_SECURE     = os.environ.get('MINIO_SECURE', 'True').lower() == 'true'
-    MINIO_REGION     = os.environ.get('MINIO_REGION', 'us-east-005')
+    # ── S3 / Backblaze ────────────────────────────────────────
+    S3_ENDPOINT   = os.environ.get('S3_ENDPOINT',   's3.us-east-005.backblazeb2.com')
+    S3_ACCESS_KEY = os.environ.get('S3_ACCESS_KEY', '')
+    S3_SECRET_KEY = os.environ.get('S3_SECRET_KEY', '')
+    S3_BUCKET     = os.environ.get('S3_BUCKET',     'privcloud-files')
+    S3_SECURE     = os.environ.get('S3_SECURE', 'True').lower() == 'true'
 
     # ── Google OAuth ──────────────────────────────────────────
     GOOGLE_CLIENT_ID     = os.environ.get('GOOGLE_CLIENT_ID',     '')

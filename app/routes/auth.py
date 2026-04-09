@@ -199,7 +199,13 @@ def google_callback():
         db.session.commit()
         login_user(user, remember=True)
 
-        return redirect('/admin.html' if user.is_admin else '/dashboard.html')
+        if user.is_admin:
+            # For strict separation, admins shouldn't log in via the user-facing Google flow
+            # If they are already logged in, we logout to enforce using the admin door
+            logout_user()
+            return redirect('/login.html?error=admin_restricted')
+
+        return redirect('/dashboard.html')
 
     except Exception as e:
         current_app.logger.error(f'Google OAuth error: {e}')

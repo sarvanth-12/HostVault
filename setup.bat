@@ -19,7 +19,7 @@ if not exist ".env" (
   echo [!] .env file not found!
   echo     Please:
   echo     1. Copy .env.example to .env
-  echo     2. Fill in your PostgreSQL password and MinIO credentials
+  echo     2. Fill in your PostgreSQL password and S3/Backblaze B2 credentials
   echo     3. Run this script again
   echo.
   pause

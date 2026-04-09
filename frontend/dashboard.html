@@ -228,6 +228,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
       <div class="sb-bar"><div class="sb-bar-fill" id="sbStorageFill" style="width:0%"></div></div>
     </div>
     <nav class="sb-nav">
+      <div id="adminLink" style="display:none">
+        <div class="sb-section">Management</div>
+        <a class="sb-item" href="admin.html" style="margin-bottom:10px;background:rgba(124,58,237,0.1);color:#a78bfa;border:1px solid rgba(124,58,237,0.2)">
+          <span class="sb-icon" style="background:rgba(124,58,237,0.2)">🛡️</span> Back to Admin
+        </a>
+      </div>
       <div class="sb-section">Storage</div>
       <button class="sb-item active" data-view="files" onclick="show('files',this)">
         <span class="sb-icon">📁</span> My Files
@@ -496,6 +502,11 @@ async function loadUser(){
   const r=await api('GET','/api/auth/me');if(!r)return;
   const d=await r.json();if(!d.authenticated){window.location.href='/login.html';return;}
   currentUser=d.user;
+  if(currentUser.role === 'admin') {
+    document.getElementById('adminLink').style.display = 'block';
+    document.querySelector('.sb-urole').textContent = 'Administrator';
+    document.querySelector('.sb-urole').style.color = '#a78bfa';
+  }
   const i=((currentUser.first_name||'')[0]||'')+((currentUser.last_name||'')[0]||'');
   document.getElementById('sbAvatar').textContent=i.toUpperCase();
   document.getElementById('sbName').textContent=currentUser.full_name||'User';

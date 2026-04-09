@@ -47,8 +47,7 @@ body { min-height: 100vh; display: flex; align-items: center; justify-content: c
 
     <div style="text-align:center">
       <div class="admin-badge">🔐 Admin Portal</div>
-      <div class="admin-title">Admin Sign In</div>
-      <div class="admin-sub">This portal is restricted to administrators only. Unauthorized access is logged and monitored.</div>
+      <div class="admin-title">Admin Login Page</div>
     </div>
 
     <div class="error-msg" id="errorMsg"></div>
@@ -61,13 +60,13 @@ body { min-height: 100vh; display: flex; align-items: center; justify-content: c
 
     <div class="form-group">
       <label>Admin Email</label>
-      <input type="email" id="email" placeholder="admin@example.com"
+      <input type="email" id="email" 
         readonly onfocus="this.removeAttribute('readonly')" autocomplete="off">
     </div>
     <div class="form-group">
       <label>Password</label>
       <div class="pass-wrapper">
-        <input type="password" id="password" placeholder="Enter admin password"
+        <input type="password" id="password" 
           readonly onfocus="this.removeAttribute('readonly')" autocomplete="new-password">
         <button class="pass-toggle" onclick="togglePass()" type="button">👁</button>
       </div>
@@ -77,9 +76,7 @@ body { min-height: 100vh; display: flex; align-items: center; justify-content: c
       Sign In to Admin Panel →
     </button>
 
-    <div class="security-note">
-      🛡️ All admin login attempts are recorded in the activity log.
-    </div>
+
 
     <div class="back-link">
       Not an admin? <a href="login.html">Go to user login →</a>

@@ -4,11 +4,6 @@ from app.config import Config
 
 app = create_app()
 
-# Auto-create database tables on startup
-with app.app_context():
-    from app.extensions import db
-    db.create_all()
-
 if __name__ == '__main__':
     print(f"""
 ╔══════════════════════════════════════════╗
