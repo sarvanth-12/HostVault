@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: hostvault
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/init_db.py && python run.py
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hostvault-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: S3_ENDPOINT
+        value: s3.us-east-005.backblazeb2.com
+      - key: S3_BUCKET
+        value: hostvault-file
+      - key: S3_SECURE
+        value: "True"
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: PORT
+        value: "10000"
+      - key: FRONTEND_URL
+        sync: false # User will set this after first deploy to match the .onrender.com URL
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+
+databases:
+  - name: hostvault-db
+    plan: free
