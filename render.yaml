@@ -37,3 +37,4 @@ services:
 databases:
   - name: hostvault-db
     plan: free
+    region: singapore
